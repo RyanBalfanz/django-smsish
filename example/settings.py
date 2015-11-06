@@ -43,6 +43,8 @@ INSTALLED_APPS += (
     'smsish',
 )
 
+SMS_BACKEND = 'smsish.sms.backends.dummy.SMSBackend'
+
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',

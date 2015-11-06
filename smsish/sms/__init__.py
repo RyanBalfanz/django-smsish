@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 from django.conf import settings
 from django.utils.module_loading import import_string
 
-from core.sms.message import (
+from smsish.sms.message import (
 	SMSMessage,
 )
 

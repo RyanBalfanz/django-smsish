@@ -14,7 +14,7 @@ class SMSMessage(EmailMessage):
 		super().__init__(None, body, from_number, to, bcc, connection, attachments, headers, cc, reply_to)
 
 	def get_connection(self, fail_silently=False):
-		from core.sms import get_sms_connection as get_connection
+		from smsish.sms import get_sms_connection as get_connection
 		if not self.connection:
 			self.connection = get_connection(fail_silently=fail_silently)
 		return self.connection
