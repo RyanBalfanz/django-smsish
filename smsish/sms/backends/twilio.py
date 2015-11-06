@@ -5,9 +5,8 @@ from twilio.rest import TwilioRestClient
 
 
 class SMSBackend(BaseEmailBackend):
-	def __init__(self, host=None, port=None, username=None, password=None, use_tls=None,
-		fail_silently=False, use_ssl=None, timeout=None, ssl_keyfile=None, ssl_certfile=None, **kwargs):
-		super().__init__(username=None, password=None, fail_silently=fail_silently)
+	def __init__(self, fail_silently=False, **kwargs):
+		super().__init__(fail_silently=fail_silently)
 		self.connection = None
 
 	def open(self):
