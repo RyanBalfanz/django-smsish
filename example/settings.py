@@ -46,14 +46,13 @@ INSTALLED_APPS += (
 SMS_BACKEND_CONSOLE = 'smsish.sms.backends.console.SMSBackend'
 SMS_BACKEND_DUMMY = 'smsish.sms.backends.dummy.SMSBackend'
 SMS_BACKEND_TWILIO = 'smsish.sms.backends.twilio.SMSBackend'
-SMS_BACKEND = SMS_BACKEND_TWILIO
+SMS_BACKEND = SMS_BACKEND_DUMMY
 
-if (SMS_BACKEND == SMS_BACKEND_TWILIO):
-    TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID", None)
-    TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN", None)
-    # This number passes all validation.
-    TWILIO_MAGIC_FROM_NUMBER = "+15005550006"
-    TWILIO_FROM_NUMBER = os.getenv("TWILIO_FROM_NUMBER", TWILIO_MAGIC_FROM_NUMBER)
+TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID", None)
+TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN", None)
+# This number passes all validation.
+TWILIO_MAGIC_FROM_NUMBER = "+15005550006"
+TWILIO_FROM_NUMBER = os.getenv("TWILIO_FROM_NUMBER", TWILIO_MAGIC_FROM_NUMBER)
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
