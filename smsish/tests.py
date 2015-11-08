@@ -122,3 +122,36 @@ class SendSMSUsingTwilioTestCase(TestCase):
 		numSent = sms.send()
 		self.assertEqual(numSent, 0)
 		self.assertEqual(len(mail.outbox), 0)
+
+
+@override_settings(
+	SMS_BACKEND='smsish.sms.backends.filebased.SMSBackend',
+	EMAIL_FILE_PATH="outbox",)
+class SendSMSUsingFilebasedTestCase(TestCase):
+	"""
+	TODO: Test that files are actually written: see https://github.com/django/django/blob/master/tests/mail/tests.py#L876.
+	"""
+	def setUp(self):
+		self.sms = SMSMessage(
+			"Body",
+			FROM_NUMBER,
+			[TO_NUMBER]
+		)
+		self.sms_no_recipients = SMSMessage("Body", TO_NUMBER, [])
+
+	def test_send(self):
+		sms = self.sms
+		numSent = sms.send()
+		self.assertEqual(numSent, 1)
+		self.assertEqual(len(mail.outbox), 0)
+
+	def test_send_sms(self):
+		numSent = send_sms("Body", FROM_NUMBER, [TO_NUMBER])
+		self.assertEqual(numSent, 1)
+		self.assertEqual(len(mail.outbox), 0)
+
+	def test_send_to_nobody(self):
+		sms = self.sms_no_recipients
+		numSent = sms.send()
+		self.assertEqual(numSent, 0)
+		self.assertEqual(len(mail.outbox), 0)
