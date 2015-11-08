@@ -6,7 +6,6 @@ from django.core import mail
 from django.core.mail.backends.locmem import EmailBackend
 
 
-
 class SMSBackend(EmailBackend):
 	"""A SMS backend for use during test sessions.
 	The test connection stores SMS messages in a dummy outbox,
