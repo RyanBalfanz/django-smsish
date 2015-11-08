@@ -13,25 +13,22 @@ setup(
 	packages=['smsish'],
 	include_package_data=True,
 	license='MIT',  # example license
-	description='A simple Django app to send SMS messages.',
+	description='A simple Django app to send SMS messages using an API similar to that of django.core.mail.',
 	long_description=README,
-	url='http://www.example.com/',
+	url='https://github.com/RyanBalfanz/django-smsish',
 	author='Ryan Balfanz',
 	author_email='ryan@ryanbalfanz.net',
 	classifiers=[
 		'Environment :: Web Environment',
 		'Framework :: Django',
+		'Framework :: Django :: 1.8',
 		'Intended Audience :: Developers',
-		'License :: OSI Approved :: BSD License', # example license
+		'License :: OSI Approved :: MIT License',
 		'Operating System :: OS Independent',
 		'Programming Language :: Python',
-		# Replace these appropriately if you are stuck on Python 2.
 		'Programming Language :: Python :: 3',
-		# 'Programming Language :: Python :: 3.2',
-		# 'Programming Language :: Python :: 3.3',
-		# 'Programming Language :: Python :: 3.4',
 		'Programming Language :: Python :: 3.5',
-		'Topic :: Internet :: WWW/HTTP',
-		# 'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
+		'Topic :: Communications',
+		'Topic :: Communications :: Telephony',
 	],
 )
