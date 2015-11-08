@@ -1,6 +1,7 @@
 language: python
 env:
-  - DJANGO_VERSION=1.7
+  # No 1.7 due to ImportError: cannot import name captured_stdout
+  # - DJANGO_VERSION=1.7
   - DJANGO_VERSION=1.8
   - DJANGO_VERSION=1.8.6
 python:
