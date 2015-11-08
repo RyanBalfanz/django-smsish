@@ -1,5 +1,7 @@
+from django.core import mail
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.test.utils import captured_stdout
 
 from smsish.sms import send_sms
 from smsish.sms.message import SMSMessage
@@ -8,6 +10,7 @@ FROM_NUMBER = "+15005550006"
 TO_NUMBER = "+15005550006"
 
 
+@override_settings(SMS_BACKEND='smsish.sms.backends.dummy.SMSBackend')
 class SMSMessageTestCase(TestCase):
 	def setUp(self):
 		self.sms = SMSMessage(
@@ -29,15 +32,27 @@ class SMSMessageTestCase(TestCase):
 	def test_send(self):
 		sms = self.sms
 		numSent = sms.send()
+
+		# Test that one message has been sent.
 		self.assertEqual(numSent, 1)
+		self.assertEqual(len(mail.outbox), 0)
 
-		sms_no_recipients = self.sms_no_recipients
-		numSent = sms_no_recipients.send()
+	def test_send_sms(self):
+		numSent = send_sms("Body", FROM_NUMBER, [TO_NUMBER])
+		self.assertEqual(numSent, 1)
+		self.assertEqual(len(mail.outbox), 0)
+
+	def test_send_to_nobody(self):
+		sms = self.sms_no_recipients
+		numSent = sms.send()
+
+		# Test that no message has been sent.
 		self.assertEqual(numSent, 0)
+		self.assertEqual(len(mail.outbox), 0)
 
 
-class SMSMessageTwilioTestCase(TestCase):
-	@override_settings(SMS_BACKEND='smsish.sms.backends.twilio.SMSBackend')
+@override_settings(SMS_BACKEND='smsish.sms.backends.console.SMSBackend')
+class SendSMSUsingConsoleTestCase(TestCase):
 	def setUp(self):
 		self.sms = SMSMessage(
 			"Body",
@@ -46,34 +61,68 @@ class SMSMessageTwilioTestCase(TestCase):
 		)
 		self.sms_no_recipients = SMSMessage("Body", TO_NUMBER, [])
 
-	@override_settings(SMS_BACKEND='smsish.sms.backends.twilio.SMSBackend')
-	def test_create_with_subject_not_allowed(self):
-		with self.assertRaises(TypeError):
-			SMSMessage("Subject", "Body", FROM_NUMBER, [TO_NUMBER])
+	def test_send(self):
+		with captured_stdout() as stdout:
+			sms = self.sms
+			numSent = sms.send()
+			self.assertEqual(numSent, 1)
+			output = stdout.getvalue()
+			self.assertTrue("Subject: None" in output)
+			self.assertTrue("From: +15005550006" in output)
+			self.assertTrue("To: +15005550006" in output)
+			self.assertTrue("Body" in output)
 
-	@override_settings(SMS_BACKEND='smsish.sms.backends.twilio.SMSBackend')
-	def test_recipients(self):
-		sms = self.sms
-		recipients = sms.recipients()
-		self.assertEqual(recipients, [TO_NUMBER])
+		with captured_stdout() as stdout:
+			sms_no_recipients = self.sms_no_recipients
+			numSent = sms_no_recipients.send()
+			self.assertEqual(numSent, 0)
+			self.assertEqual(stdout.getvalue(), "")
 
-	@override_settings(SMS_BACKEND='smsish.sms.backends.twilio.SMSBackend')
+	def test_send_sms(self):
+		with captured_stdout() as stdout:
+			numSent = send_sms("Body", FROM_NUMBER, [TO_NUMBER])
+			self.assertEqual(numSent, 1)
+			self.assertEqual(len(mail.outbox), 0)
+			output = stdout.getvalue()
+			self.assertTrue("Subject: None" in output)
+			self.assertTrue("From: +15005550006" in output)
+			self.assertTrue("To: +15005550006" in output)
+			self.assertTrue("Body" in output)
+
+	def test_send_to_nobody(self):
+		sms = self.sms_no_recipients
+		numSent = sms.send()
+		self.assertEqual(numSent, 0)
+		self.assertEqual(len(mail.outbox), 0)
+
+
+@override_settings(SMS_BACKEND='smsish.sms.backends.twilio.SMSBackend')
+class SendSMSUsingTwilioTestCase(TestCase):
+	def setUp(self):
+		self.sms = SMSMessage(
+			"Body",
+			FROM_NUMBER,
+			[TO_NUMBER]
+		)
+		self.sms_no_recipients = SMSMessage("Body", TO_NUMBER, [])
+
 	def test_send(self):
 		sms = self.sms
 		numSent = sms.send()
 		self.assertEqual(numSent, 1)
+		self.assertEqual(len(mail.outbox), 0)
 
-		sms_no_recipients = self.sms_no_recipients
-		numSent = sms_no_recipients.send()
+	def test_send_sms(self):
+		numSent = send_sms("Body", FROM_NUMBER, [TO_NUMBER])
+		self.assertEqual(numSent, 1)
+		self.assertEqual(len(mail.outbox), 0)
+
+	def test_send_to_nobody(self):
+		sms = self.sms_no_recipients
+		numSent = sms.send()
 		self.assertEqual(numSent, 0)
+		self.assertEqual(len(mail.outbox), 0)
 
-
-class SendSMSHelperTestCase(TestCase):
-	def test_send_sms(self):
-		send_sms("Body", FROM_NUMBER, [TO_NUMBER])
-
-
-class SendSMSHelperTwilioTestCase(TestCase):
-	@override_settings(SMS_BACKEND='smsish.sms.backends.twilio.SMSBackend')
-	def test_send_sms(self):
-		send_sms("Body", FROM_NUMBER, [TO_NUMBER])
+	def test_send_nothing(self):
+		sms = self.sms
+		send_sms()
