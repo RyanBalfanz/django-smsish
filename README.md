@@ -1,5 +1,7 @@
 # django-smsish
 
+[![PyPI version](https://badge.fury.io/py/django-smsish.svg)](https://badge.fury.io/py/django-smsish)
+
 Installation
 ------------
 
