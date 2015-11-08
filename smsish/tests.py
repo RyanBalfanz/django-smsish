@@ -122,7 +122,3 @@ class SendSMSUsingTwilioTestCase(TestCase):
 		numSent = sms.send()
 		self.assertEqual(numSent, 0)
 		self.assertEqual(len(mail.outbox), 0)
-
-	def test_send_nothing(self):
-		sms = self.sms
-		send_sms()
