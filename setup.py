@@ -9,7 +9,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
 	name='django-smsish',
-	version='1.0.1',
+	version='1.1',
 	packages=[
 		'smsish',
 		'smsish.sms',
