@@ -9,8 +9,11 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
 	name='django-smsish',
-	version='0.1',
-	packages=['smsish'],
+	version='1.0',
+	packages=[
+		'smsish',
+		'smsish.sms',
+	],
 	include_package_data=True,
 	license='MIT',  # example license
 	description='A simple Django app to send SMS messages using an API similar to that of django.core.mail.',
