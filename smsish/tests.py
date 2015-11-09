@@ -183,3 +183,62 @@ class SendSMSUsingLocmemTestCase(TestCase):
 		numSent = sms.send()
 		self.assertEqual(numSent, 0)
 		self.assertEqual(len(mail.outbox), 0)
+
+
+TEST_SMTP_BACKENDS = False
+if TEST_SMTP_BACKENDS:
+	@override_settings(
+		SMS_BACKEND='smsish.sms.backends.smtp.SMSBackend',
+		EMAIL_HOST="127.0.0.1",
+		EMAIL_PORT=1025,
+		EMAIL_HOST_USER="",
+		EMAIL_HOST_PASSWORD="",
+		EMAIL_USE_TLS=False,)
+	class SendSMSUsingSMTPTestCase(TestCase):
+		def setUp(self):
+			self.sms = SMSMessage(
+				"Body",
+				FROM_NUMBER,
+				[TO_NUMBER]
+			)
+			self.sms_no_recipients = SMSMessage("Body", TO_NUMBER, [])
+
+		def test_send(self):
+			sms = self.sms
+			numSent = sms.send()
+			self.assertEqual(numSent, 1)
+
+		def test_send_sms(self):
+			numSent = send_sms("Body", FROM_NUMBER, [TO_NUMBER])
+			self.assertEqual(numSent, 1)
+
+		def test_send_to_nobody(self):
+			sms = self.sms_no_recipients
+			numSent = sms.send()
+			self.assertEqual(numSent, 0)
+			self.assertEqual(len(mail.outbox), 0)
+
+	@override_settings(SMS_BACKEND='smsish.sms.backends.mailcatcher.SMSBackend')
+	class SendSMSUsingMailCatcherTestCase(TestCase):
+		def setUp(self):
+			self.sms = SMSMessage(
+				"Body",
+				FROM_NUMBER,
+				[TO_NUMBER]
+			)
+			self.sms_no_recipients = SMSMessage("Body", TO_NUMBER, [])
+
+		def test_send(self):
+			sms = self.sms
+			numSent = sms.send()
+			self.assertEqual(numSent, 1)
+
+		def test_send_sms(self):
+			numSent = send_sms("Body", FROM_NUMBER, [TO_NUMBER])
+			self.assertEqual(numSent, 1)
+
+		def test_send_to_nobody(self):
+			sms = self.sms_no_recipients
+			numSent = sms.send()
+			self.assertEqual(numSent, 0)
+			self.assertEqual(len(mail.outbox), 0)
