@@ -5,6 +5,7 @@ from django.test.utils import captured_stdout
 from django.test.utils import override_settings
 
 from smsish.sms import send_sms
+from smsish.sms import send_mass_sms
 from smsish.sms.message import SMSMessage
 
 VALID_FROM_NUMBER = settings.TWILIO_MAGIC_FROM_NUMBER
@@ -49,6 +50,13 @@ class SMSMessageTestCase(TestCase):
 
 		# Test that no message has been sent.
 		self.assertEqual(numSent, 0)
+		self.assertEqual(len(mail.outbox), 0)
+
+	def test_send_mass_sms(self):
+		messageSpec = ("Body", VALID_FROM_NUMBER, [VALID_TO_NUMBER])
+		datatuple = (messageSpec for _ in range(10))
+		numSent = send_mass_sms(datatuple)
+		self.assertEqual(numSent, 10)
 		self.assertEqual(len(mail.outbox), 0)
 
 
@@ -96,6 +104,18 @@ class SendSMSUsingConsoleTestCase(TestCase):
 		self.assertEqual(numSent, 0)
 		self.assertEqual(len(mail.outbox), 0)
 
+	def test_send_mass_sms(self):
+		with captured_stdout() as stdout:
+			datatuple = (("Body", VALID_FROM_NUMBER, [VALID_TO_NUMBER]) for _ in range(10))
+			numSent = send_mass_sms(datatuple)
+			self.assertEqual(numSent, 10)
+			self.assertEqual(len(mail.outbox), 0)
+			output = stdout.getvalue()
+			self.assertTrue("Subject: None" in output)
+			self.assertTrue("From: +15005550006" in output)
+			self.assertTrue("To: +15005550006" in output)
+			self.assertTrue("Body" in output)
+
 
 @override_settings(SMS_BACKEND='smsish.sms.backends.twilio.SMSBackend')
 class SendSMSUsingTwilioTestCase(TestCase):
@@ -123,6 +143,14 @@ class SendSMSUsingTwilioTestCase(TestCase):
 		numSent = sms.send()
 		self.assertEqual(numSent, 0)
 		self.assertEqual(len(mail.outbox), 0)
+
+	def test_send_mass_sms(self):
+		from smsish.sms import get_sms_connection
+		with get_sms_connection(settings.SMS_BACKEND) as connection:
+			datatuple = (("Body", VALID_FROM_NUMBER, [VALID_TO_NUMBER]) for _ in range(10))
+			numSent = send_mass_sms(datatuple, connection=connection)
+			self.assertEqual(numSent, 10)
+			self.assertEqual(len(mail.outbox), 0)
 
 
 @override_settings(
@@ -157,6 +185,14 @@ class SendSMSUsingFilebasedTestCase(TestCase):
 		self.assertEqual(numSent, 0)
 		self.assertEqual(len(mail.outbox), 0)
 
+	def test_send_mass_sms(self):
+		from smsish.sms import get_sms_connection
+		with get_sms_connection(settings.SMS_BACKEND) as connection:
+			datatuple = (("Body", VALID_FROM_NUMBER, [VALID_TO_NUMBER]) for _ in range(10))
+			numSent = send_mass_sms(datatuple, connection=connection)
+			self.assertEqual(numSent, 10)
+			self.assertEqual(len(mail.outbox), 0)
+
 
 @override_settings(SMS_BACKEND='smsish.sms.backends.locmem.SMSBackend')
 class SendSMSUsingLocmemTestCase(TestCase):
@@ -184,6 +220,14 @@ class SendSMSUsingLocmemTestCase(TestCase):
 		numSent = sms.send()
 		self.assertEqual(numSent, 0)
 		self.assertEqual(len(mail.outbox), 0)
+
+	def test_send_mass_sms(self):
+		from smsish.sms import get_sms_connection
+		with get_sms_connection(settings.SMS_BACKEND) as connection:
+			datatuple = (("Body", VALID_FROM_NUMBER, [VALID_TO_NUMBER]) for _ in range(10))
+			numSent = send_mass_sms(datatuple, connection=connection)
+			self.assertEqual(numSent, 10)
+			self.assertEqual(len(mail.outbox), 10)
 
 
 @override_settings(SMS_BACKEND='smsish.sms.backends.rq.SMSBackend', SMSISH_RQ_SMS_BACKEND='smsish.sms.backends.dummy.SMSBackend', TESTING=True)
@@ -236,6 +280,15 @@ class SendSMSUsingRQTestCase(TestCase):
 		self.assertEqual(numSent, 0)
 		self.assertEqual(len(mail.outbox), 0)
 
+	def test_send_mass_sms(self):
+		from smsish.sms import get_sms_connection
+		with self.assertRaises(NotImplementedError):
+			with get_sms_connection(settings.SMS_BACKEND) as connection:
+				datatuple = (("Body", VALID_FROM_NUMBER, [VALID_TO_NUMBER]) for _ in range(10))
+				numSent = send_mass_sms(datatuple, connection=connection)
+				self.assertEqual(numSent, 10)
+				self.assertEqual(len(mail.outbox), 0)
+
 
 TEST_SMTP_BACKENDS = False
 if TEST_SMTP_BACKENDS:
@@ -270,6 +323,18 @@ if TEST_SMTP_BACKENDS:
 			self.assertEqual(numSent, 0)
 			self.assertEqual(len(mail.outbox), 0)
 
+		def test_send_mass_sms(self):
+			with captured_stdout() as stdout:
+				datatuple = (("Body", VALID_FROM_NUMBER, [VALID_TO_NUMBER]) for _ in range(10))
+				numSent = send_mass_sms(datatuple)
+				self.assertEqual(numSent, 10)
+				self.assertEqual(len(mail.outbox), 0)
+				output = stdout.getvalue()
+				self.assertTrue("Subject: None" in output)
+				self.assertTrue("From: +15005550006" in output)
+				self.assertTrue("To: +15005550006" in output)
+				self.assertTrue("Body" in output)
+
 	@override_settings(SMS_BACKEND='smsish.sms.backends.mailcatcher.SMSBackend')
 	class SendSMSUsingMailCatcherTestCase(TestCase):
 		def setUp(self):
@@ -294,3 +359,15 @@ if TEST_SMTP_BACKENDS:
 			numSent = sms.send()
 			self.assertEqual(numSent, 0)
 			self.assertEqual(len(mail.outbox), 0)
+
+		def test_send_mass_sms(self):
+			with captured_stdout() as stdout:
+				datatuple = (("Body", VALID_FROM_NUMBER, [VALID_TO_NUMBER]) for _ in range(10))
+				numSent = send_mass_sms(datatuple)
+				self.assertEqual(numSent, 10)
+				self.assertEqual(len(mail.outbox), 0)
+				output = stdout.getvalue()
+				self.assertTrue("Subject: None" in output)
+				self.assertTrue("From: +15005550006" in output)
+				self.assertTrue("To: +15005550006" in output)
+				self.assertTrue("Body" in output)

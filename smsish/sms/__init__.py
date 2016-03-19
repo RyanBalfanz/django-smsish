@@ -65,6 +65,9 @@ def send_mass_sms(datatuple, fail_silently=False, auth_user=None, auth_password=
 
 	https://github.com/django/django/blob/master/django/core/mail/__init__.py#L64
 	"""
+	import smsish.sms.backends.rq
+	if isinstance(connection, smsish.sms.backends.rq.SMSBackend):
+		raise NotImplementedError
 	connection = connection or get_sms_connection(username=auth_user, password=auth_password, fail_silently=fail_silently)
 	messages = [SMSMessage(message, from_number, recipient, connection=connection) for message, from_number, recipient in datatuple]
 	return connection.send_messages(messages)
