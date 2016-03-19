@@ -222,6 +222,7 @@ class SendSMSUsingLocmemTestCase(TestCase):
 		self.assertEqual(len(mail.outbox), 0)
 
 	def test_send_mass_sms(self):
+		from django.conf import settings
 		from smsish.sms import get_sms_connection
 		with get_sms_connection(settings.SMS_BACKEND) as connection:
 			datatuple = (("Body", VALID_FROM_NUMBER, [VALID_TO_NUMBER]) for _ in range(10))
@@ -230,7 +231,9 @@ class SendSMSUsingLocmemTestCase(TestCase):
 			self.assertEqual(len(mail.outbox), 10)
 
 
-@override_settings(SMS_BACKEND='smsish.sms.backends.rq.SMSBackend', SMSISH_RQ_SMS_BACKEND='smsish.sms.backends.dummy.SMSBackend', TESTING=True)
+@override_settings(SMS_BACKEND='smsish.sms.backends.rq.SMSBackend')
+@override_settings(SMSISH_RQ_SMS_BACKEND='smsish.sms.backends.locmem.SMSBackend')
+@override_settings(TESTING=True)
 class SendSMSUsingRQTestCase(TestCase):
 	def setUp(self):
 		self.sms_no_recipients = SMSMessage("Body", VALID_TO_NUMBER, [])
@@ -254,15 +257,15 @@ class SendSMSUsingRQTestCase(TestCase):
 		get_worker().work(burst=True)
 
 	def test_send_with_connection(self):
-		from django.conf import settings
+		# from django.conf import settings
 		from smsish.sms import get_sms_connection
 		sms = self.get_new_sms_message()
-		with get_sms_connection(settings.SMS_BACKEND_RQ) as connection:
+		with get_sms_connection() as connection:
 			jobs = connection.send_messages([sms])
 			self.assertEqual(len(jobs), 1)
 			# http://python-rq.org/docs/testing/
 			# https://github.com/ui/django-rq#testing-tip
-			self.assertEqual(len(mail.outbox), 0)
+			self.assertEqual(len(mail.outbox), 1)
 			self.process_jobs()
 			for job in jobs:
 				self.assertTrue(job.id)
@@ -281,6 +284,7 @@ class SendSMSUsingRQTestCase(TestCase):
 		self.assertEqual(len(mail.outbox), 0)
 
 	def test_send_mass_sms(self):
+		from django.conf import settings
 		from smsish.sms import get_sms_connection
 		with self.assertRaises(NotImplementedError):
 			with get_sms_connection(settings.SMS_BACKEND) as connection:

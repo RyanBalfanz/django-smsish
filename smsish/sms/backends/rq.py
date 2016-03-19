@@ -7,10 +7,6 @@ import django_rq
 from smsish.sms import get_sms_connection
 from smsish.sms.backends.base import BaseSMSBackend
 
-SMSISH_RQ_SMS_BACKEND = getattr(settings, "SMSISH_RQ_SMS_BACKEND", None)
-if SMSISH_RQ_SMS_BACKEND is None:
-	raise ImproperlyConfigured("SMSISH_RQ_SMS_BACKEND is required but missing")
-
 
 class SMSBackend(BaseSMSBackend):
 	"""
@@ -18,6 +14,11 @@ class SMSBackend(BaseSMSBackend):
 	"""
 	def __init__(self, backend=None, fail_silently=None, **kwargs):
 		super(SMSBackend, self).__init__(fail_silently=fail_silently, **kwargs)
+
+		SMSISH_RQ_SMS_BACKEND = getattr(settings, "SMSISH_RQ_SMS_BACKEND", None)
+		if backend is None and SMSISH_RQ_SMS_BACKEND is None:
+			raise ImproperlyConfigured("SMSISH_RQ_SMS_BACKEND is required but missing")
+
 		self.backend = SMSISH_RQ_SMS_BACKEND if backend is None else backend
 
 	def send_messages(self, sms_messages):
@@ -35,7 +36,6 @@ class SMSBackend(BaseSMSBackend):
 			fail_silently = self.fail_silently
 			result = django_rq.enqueue(self._send, message, backend=backend, fail_silently=fail_silently)
 			results.append(result)
-		# return len(sms_messages)
 		return results
 
 	def _send(self, sms_message, backend=None, fail_silently=False):

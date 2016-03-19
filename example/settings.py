@@ -118,6 +118,7 @@ INSTALLED_APPS += (
 # Set `SMS_BACKEND` in your settings.
 SMS_BACKEND_CONSOLE = 'smsish.sms.backends.console.SMSBackend'
 SMS_BACKEND_DUMMY = 'smsish.sms.backends.dummy.SMSBackend'
+SMS_BACKEND_LOCMEM = 'smsish.sms.backends.locmem.SMSBackend'
 SMS_BACKEND_RQ = 'smsish.sms.backends.rq.SMSBackend'
 SMS_BACKEND_TWILIO = 'smsish.sms.backends.twilio.SMSBackend'
 SMS_BACKEND = os.getenv("SMS_BACKEND", SMS_BACKEND_CONSOLE)
