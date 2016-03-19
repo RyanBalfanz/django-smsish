@@ -1,0 +1,2 @@
+web: python manage.py runserver
+worker: rqworker --url $REDIS_URL high default low
