@@ -1,4 +1,5 @@
 coverage==4.0.3
 django-extensions==1.6.1
 django-rq==0.9.0
+ipdb==0.9.0
 twilio==5.4.0
