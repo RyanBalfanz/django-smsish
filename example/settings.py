@@ -120,10 +120,7 @@ SMS_BACKEND_CONSOLE = 'smsish.sms.backends.console.SMSBackend'
 SMS_BACKEND_DUMMY = 'smsish.sms.backends.dummy.SMSBackend'
 SMS_BACKEND_RQ = 'smsish.sms.backends.rq.SMSBackend'
 SMS_BACKEND_TWILIO = 'smsish.sms.backends.twilio.SMSBackend'
-# SMS_BACKEND = SMS_BACKEND_CONSOLE
-# SMS_BACKEND = SMS_BACKEND_DUMMY
-SMS_BACKEND = SMS_BACKEND_RQ
-# SMS_BACKEND = SMS_BACKEND_TWILIO
+SMS_BACKEND = os.getenv("SMS_BACKEND", SMS_BACKEND_CONSOLE)
 
 # Set Twilio settings if needed.
 # Note: `pip install twilio` to use the Twilio backend.
@@ -145,3 +142,4 @@ if 'django_rq' in INSTALLED_APPS:
 
 if SMS_BACKEND == SMS_BACKEND_RQ:
     SMSISH_RQ_SMS_BACKEND = SMS_BACKEND_CONSOLE
+    SMSISH_RQ_SMS_BACKEND = os.getenv("SMSISH_RQ_SMS_BACKEND", SMS_BACKEND_CONSOLE)
