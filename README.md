@@ -3,6 +3,7 @@
 [![PyPI version](https://badge.fury.io/py/django-smsish.svg)](https://badge.fury.io/py/django-smsish)
 [![Build Status](https://travis-ci.org/RyanBalfanz/django-smsish.svg)](https://travis-ci.org/RyanBalfanz/django-smsish)
 [![Code Health](https://landscape.io/github/RyanBalfanz/django-smsish/master/landscape.svg?style=flat)](https://landscape.io/github/RyanBalfanz/django-smsish/master)
+[![Coverage Status](https://coveralls.io/repos/github/RyanBalfanz/django-smsish/badge.svg?branch=develop)](https://coveralls.io/github/RyanBalfanz/django-smsish)
 
 Installation
 ------------
