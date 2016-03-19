@@ -106,7 +106,7 @@ STATIC_URL = '/static/'
 # django-smsish settings
 # ======================
 
-TESTING = os.getenv("TESTING", str(int(False)))
+TESTING = bool(int(os.getenv("TESTING", str(int(False)))))
 
 # Add `smsish` to your INSTALLED_APPS
 INSTALLED_APPS += (
