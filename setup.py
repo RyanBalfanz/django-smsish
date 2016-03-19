@@ -9,7 +9,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
 	name='django-smsish',
-	version='1.1.2',
+	version='1.2.0',
 	packages=[
 		'smsish',
 		'smsish.sms',
@@ -23,6 +23,8 @@ setup(
 	author='Ryan Balfanz',
 	author_email='ryan@ryanbalfanz.net',
 	classifiers=[
+		'Development Status :: 4 - Beta',
+		# 'Development Status :: 5 - Production/Stable',
 		'Environment :: Web Environment',
 		'Framework :: Django',
 		'Framework :: Django :: 1.8',
