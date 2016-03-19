@@ -185,6 +185,57 @@ class SendSMSUsingLocmemTestCase(TestCase):
 		self.assertEqual(len(mail.outbox), 0)
 
 
+@override_settings(SMS_BACKEND='smsish.sms.backends.rq.SMSBackend', SMSISH_RQ_SMS_BACKEND='smsish.sms.backends.dummy.SMSBackend', TESTING=True)
+class SendSMSUsingRQTestCase(TestCase):
+	def setUp(self):
+		self.sms_no_recipients = SMSMessage("Body", TO_NUMBER, [])
+
+	def get_new_sms_message(self):
+		return SMSMessage(
+			"Body",
+			FROM_NUMBER,
+			[TO_NUMBER]
+		)
+
+	def test_send(self):
+		with self.assertRaises(AssertionError):
+			sms = self.get_new_sms_message()
+			numSent = sms.send()
+			self.assertEqual(numSent, 1)
+			self.assertEqual(len(mail.outbox), 1)
+
+	def process_jobs(self):
+		from django_rq import get_worker
+		get_worker().work(burst=True)
+
+	def test_send_with_connection(self):
+		from django.conf import settings
+		from smsish.sms import get_sms_connection
+		sms = self.get_new_sms_message()
+		with get_sms_connection(settings.SMS_BACKEND_RQ) as connection:
+			jobs = connection.send_messages([sms])
+			self.assertEqual(len(jobs), 1)
+			# http://python-rq.org/docs/testing/
+			# https://github.com/ui/django-rq#testing-tip
+			self.assertEqual(len(mail.outbox), 0)
+			self.process_jobs()
+			for job in jobs:
+				self.assertTrue(job.id)
+				self.assertEqual(job.args[0].body, sms.body)
+
+	def test_send_sms(self):
+		with self.assertRaises(AssertionError):
+			numSent = send_sms("Body", FROM_NUMBER, [TO_NUMBER])
+			self.assertEqual(numSent, 1)
+			self.assertEqual(len(mail.outbox), 1)
+
+	def test_send_to_nobody(self):
+		sms = self.sms_no_recipients
+		numSent = sms.send()
+		self.assertEqual(numSent, 0)
+		self.assertEqual(len(mail.outbox), 0)
+
+
 TEST_SMTP_BACKENDS = False
 if TEST_SMTP_BACKENDS:
 	@override_settings(
