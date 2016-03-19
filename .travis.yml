@@ -35,4 +35,6 @@ install:
   - python setup.py -q install
   - pip install -r requirements-travisci.txt
 # command to run tests
-script: python manage.py test
+script: coverage run --source=smsish manage.py test
+after_success:
+  coveralls
