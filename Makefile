@@ -12,7 +12,7 @@ test:
 	python manage.py test smsish
 
 test_coverage:
-	coverage run manage.py test smsish
+	coverage run --source=smsish manage.py test smsish
 
 build:
 	python setup.py sdist
