@@ -3,7 +3,17 @@ env:
   # No 1.7 due to ImportError: cannot import name captured_stdout
   # - DJANGO_VERSION=1.7
   - DJANGO_VERSION=1.8
+  - DJANGO_VERSION=1.8.1
+  - DJANGO_VERSION=1.8.2
+  - DJANGO_VERSION=1.8.3
+  - DJANGO_VERSION=1.8.4
+  - DJANGO_VERSION=1.8.5
   - DJANGO_VERSION=1.8.6
+  - DJANGO_VERSION=1.8.7
+  - DJANGO_VERSION=1.8.8
+  - DJANGO_VERSION=1.8.9
+  - DJANGO_VERSION=1.8.10
+  - DJANGO_VERSION=1.8.11
   - DJANGO_VERSION=1.9
   - DJANGO_VERSION=1.9.1
   - DJANGO_VERSION=1.9.2
@@ -18,7 +28,7 @@ python:
   - "3.5"
   - "3.5-dev" # 3.5 development branch
   # - "3.6-dev" # 3.5 development branch
-  # - "nightly" # currently points to 3.6-dev
+  - "nightly" # currently points to 3.6-dev
 # command to install dependencies
 install:
   - pip install Django==$DJANGO_VERSION
