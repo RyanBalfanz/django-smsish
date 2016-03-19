@@ -1,3 +1,2 @@
 -r requirements-base.txt
-coverage==4.0.3
 coveralls==1.1
