@@ -106,16 +106,22 @@ STATIC_URL = '/static/'
 # django-smsish settings
 # ======================
 
+TESTING = bool(int(os.getenv("TESTING", str(int(False)))))
+
 # Add `smsish` to your INSTALLED_APPS
 INSTALLED_APPS += (
+    'django_extensions',
+    'django_rq',  # Required by `smsish.sms.backends.rq.SMSBackend`.
     'smsish',
 )
 
 # Set `SMS_BACKEND` in your settings.
 SMS_BACKEND_CONSOLE = 'smsish.sms.backends.console.SMSBackend'
 SMS_BACKEND_DUMMY = 'smsish.sms.backends.dummy.SMSBackend'
+SMS_BACKEND_LOCMEM = 'smsish.sms.backends.locmem.SMSBackend'
+SMS_BACKEND_RQ = 'smsish.sms.backends.rq.SMSBackend'
 SMS_BACKEND_TWILIO = 'smsish.sms.backends.twilio.SMSBackend'
-SMS_BACKEND = SMS_BACKEND_DUMMY
+SMS_BACKEND = os.getenv("SMS_BACKEND", SMS_BACKEND_CONSOLE)
 
 # Set Twilio settings if needed.
 # Note: `pip install twilio` to use the Twilio backend.
@@ -123,3 +129,18 @@ TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID", None)
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN", None)
 TWILIO_MAGIC_FROM_NUMBER = "+15005550006"  # This number passes all validation.
 TWILIO_FROM_NUMBER = os.getenv("TWILIO_FROM_NUMBER", TWILIO_MAGIC_FROM_NUMBER)
+
+if 'django_rq' in INSTALLED_APPS:
+    RQ_QUEUES = {
+        'default': {
+            'URL': os.getenv("REDIS_URL", None),
+        },
+    }
+    if DEBUG or TESTING:
+        if DEBUG or TESTING:
+            for queueConfig in RQ_QUEUES.values():
+                queueConfig['ASYNC'] = False
+
+if SMS_BACKEND == SMS_BACKEND_RQ:
+    SMSISH_RQ_SMS_BACKEND = SMS_BACKEND_CONSOLE
+    SMSISH_RQ_SMS_BACKEND = os.getenv("SMSISH_RQ_SMS_BACKEND", SMS_BACKEND_CONSOLE)
