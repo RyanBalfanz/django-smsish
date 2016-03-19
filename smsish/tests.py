@@ -1,13 +1,14 @@
+from django.conf import settings
 from django.core import mail
 from django.test import TestCase
-from django.test.utils import override_settings
 from django.test.utils import captured_stdout
+from django.test.utils import override_settings
 
 from smsish.sms import send_sms
 from smsish.sms.message import SMSMessage
 
-FROM_NUMBER = "+15005550006"
-TO_NUMBER = "+15005550006"
+VALID_FROM_NUMBER = settings.TWILIO_MAGIC_FROM_NUMBER
+VALID_TO_NUMBER = settings.TWILIO_MAGIC_FROM_NUMBER
 
 
 @override_settings(SMS_BACKEND='smsish.sms.backends.dummy.SMSBackend')
@@ -15,19 +16,19 @@ class SMSMessageTestCase(TestCase):
 	def setUp(self):
 		self.sms = SMSMessage(
 			"Body",
-			FROM_NUMBER,
-			[TO_NUMBER]
+			VALID_FROM_NUMBER,
+			[VALID_TO_NUMBER]
 		)
-		self.sms_no_recipients = SMSMessage("Body", TO_NUMBER, [])
+		self.sms_no_recipients = SMSMessage("Body", VALID_TO_NUMBER, [])
 
 	def test_create_with_subject_not_allowed(self):
 		with self.assertRaises(TypeError):
-			SMSMessage("Subject", "Body", FROM_NUMBER, [TO_NUMBER])
+			SMSMessage("Subject", "Body", VALID_FROM_NUMBER, [VALID_TO_NUMBER])
 
 	def test_recipients(self):
 		sms = self.sms
 		recipients = sms.recipients()
-		self.assertEqual(recipients, [TO_NUMBER])
+		self.assertEqual(recipients, [VALID_TO_NUMBER])
 
 	def test_send(self):
 		sms = self.sms
@@ -38,7 +39,7 @@ class SMSMessageTestCase(TestCase):
 		self.assertEqual(len(mail.outbox), 0)
 
 	def test_send_sms(self):
-		numSent = send_sms("Body", FROM_NUMBER, [TO_NUMBER])
+		numSent = send_sms("Body", VALID_FROM_NUMBER, [VALID_TO_NUMBER])
 		self.assertEqual(numSent, 1)
 		self.assertEqual(len(mail.outbox), 0)
 
@@ -56,10 +57,10 @@ class SendSMSUsingConsoleTestCase(TestCase):
 	def setUp(self):
 		self.sms = SMSMessage(
 			"Body",
-			FROM_NUMBER,
-			[TO_NUMBER]
+			VALID_FROM_NUMBER,
+			[VALID_TO_NUMBER]
 		)
-		self.sms_no_recipients = SMSMessage("Body", TO_NUMBER, [])
+		self.sms_no_recipients = SMSMessage("Body", VALID_TO_NUMBER, [])
 
 	def test_send(self):
 		with captured_stdout() as stdout:
@@ -80,7 +81,7 @@ class SendSMSUsingConsoleTestCase(TestCase):
 
 	def test_send_sms(self):
 		with captured_stdout() as stdout:
-			numSent = send_sms("Body", FROM_NUMBER, [TO_NUMBER])
+			numSent = send_sms("Body", VALID_FROM_NUMBER, [VALID_TO_NUMBER])
 			self.assertEqual(numSent, 1)
 			self.assertEqual(len(mail.outbox), 0)
 			output = stdout.getvalue()
@@ -101,10 +102,10 @@ class SendSMSUsingTwilioTestCase(TestCase):
 	def setUp(self):
 		self.sms = SMSMessage(
 			"Body",
-			FROM_NUMBER,
-			[TO_NUMBER]
+			VALID_FROM_NUMBER,
+			[VALID_TO_NUMBER]
 		)
-		self.sms_no_recipients = SMSMessage("Body", TO_NUMBER, [])
+		self.sms_no_recipients = SMSMessage("Body", VALID_TO_NUMBER, [])
 
 	def test_send(self):
 		sms = self.sms
@@ -113,7 +114,7 @@ class SendSMSUsingTwilioTestCase(TestCase):
 		self.assertEqual(len(mail.outbox), 0)
 
 	def test_send_sms(self):
-		numSent = send_sms("Body", FROM_NUMBER, [TO_NUMBER])
+		numSent = send_sms("Body", VALID_FROM_NUMBER, [VALID_TO_NUMBER])
 		self.assertEqual(numSent, 1)
 		self.assertEqual(len(mail.outbox), 0)
 
@@ -134,10 +135,10 @@ class SendSMSUsingFilebasedTestCase(TestCase):
 	def setUp(self):
 		self.sms = SMSMessage(
 			"Body",
-			FROM_NUMBER,
-			[TO_NUMBER]
+			VALID_FROM_NUMBER,
+			[VALID_TO_NUMBER]
 		)
-		self.sms_no_recipients = SMSMessage("Body", TO_NUMBER, [])
+		self.sms_no_recipients = SMSMessage("Body", VALID_TO_NUMBER, [])
 
 	def test_send(self):
 		sms = self.sms
@@ -146,7 +147,7 @@ class SendSMSUsingFilebasedTestCase(TestCase):
 		self.assertEqual(len(mail.outbox), 0)
 
 	def test_send_sms(self):
-		numSent = send_sms("Body", FROM_NUMBER, [TO_NUMBER])
+		numSent = send_sms("Body", VALID_FROM_NUMBER, [VALID_TO_NUMBER])
 		self.assertEqual(numSent, 1)
 		self.assertEqual(len(mail.outbox), 0)
 
@@ -162,10 +163,10 @@ class SendSMSUsingLocmemTestCase(TestCase):
 	def setUp(self):
 		self.sms = SMSMessage(
 			"Body",
-			FROM_NUMBER,
-			[TO_NUMBER]
+			VALID_FROM_NUMBER,
+			[VALID_TO_NUMBER]
 		)
-		self.sms_no_recipients = SMSMessage("Body", TO_NUMBER, [])
+		self.sms_no_recipients = SMSMessage("Body", VALID_TO_NUMBER, [])
 
 	def test_send(self):
 		sms = self.sms
@@ -174,7 +175,7 @@ class SendSMSUsingLocmemTestCase(TestCase):
 		self.assertEqual(len(mail.outbox), 1)
 
 	def test_send_sms(self):
-		numSent = send_sms("Body", FROM_NUMBER, [TO_NUMBER])
+		numSent = send_sms("Body", VALID_FROM_NUMBER, [VALID_TO_NUMBER])
 		self.assertEqual(numSent, 1)
 		self.assertEqual(len(mail.outbox), 1)
 
@@ -188,13 +189,13 @@ class SendSMSUsingLocmemTestCase(TestCase):
 @override_settings(SMS_BACKEND='smsish.sms.backends.rq.SMSBackend', SMSISH_RQ_SMS_BACKEND='smsish.sms.backends.dummy.SMSBackend', TESTING=True)
 class SendSMSUsingRQTestCase(TestCase):
 	def setUp(self):
-		self.sms_no_recipients = SMSMessage("Body", TO_NUMBER, [])
+		self.sms_no_recipients = SMSMessage("Body", VALID_TO_NUMBER, [])
 
 	def get_new_sms_message(self):
 		return SMSMessage(
 			"Body",
-			FROM_NUMBER,
-			[TO_NUMBER]
+			VALID_FROM_NUMBER,
+			[VALID_TO_NUMBER]
 		)
 
 	def test_send(self):
@@ -225,7 +226,7 @@ class SendSMSUsingRQTestCase(TestCase):
 
 	def test_send_sms(self):
 		with self.assertRaises(AssertionError):
-			numSent = send_sms("Body", FROM_NUMBER, [TO_NUMBER])
+			numSent = send_sms("Body", VALID_FROM_NUMBER, [VALID_TO_NUMBER])
 			self.assertEqual(numSent, 1)
 			self.assertEqual(len(mail.outbox), 1)
 
@@ -249,10 +250,10 @@ if TEST_SMTP_BACKENDS:
 		def setUp(self):
 			self.sms = SMSMessage(
 				"Body",
-				FROM_NUMBER,
-				[TO_NUMBER]
+				VALID_FROM_NUMBER,
+				[VALID_TO_NUMBER]
 			)
-			self.sms_no_recipients = SMSMessage("Body", TO_NUMBER, [])
+			self.sms_no_recipients = SMSMessage("Body", VALID_TO_NUMBER, [])
 
 		def test_send(self):
 			sms = self.sms
@@ -260,7 +261,7 @@ if TEST_SMTP_BACKENDS:
 			self.assertEqual(numSent, 1)
 
 		def test_send_sms(self):
-			numSent = send_sms("Body", FROM_NUMBER, [TO_NUMBER])
+			numSent = send_sms("Body", VALID_FROM_NUMBER, [VALID_TO_NUMBER])
 			self.assertEqual(numSent, 1)
 
 		def test_send_to_nobody(self):
@@ -274,10 +275,10 @@ if TEST_SMTP_BACKENDS:
 		def setUp(self):
 			self.sms = SMSMessage(
 				"Body",
-				FROM_NUMBER,
-				[TO_NUMBER]
+				VALID_FROM_NUMBER,
+				[VALID_TO_NUMBER]
 			)
-			self.sms_no_recipients = SMSMessage("Body", TO_NUMBER, [])
+			self.sms_no_recipients = SMSMessage("Body", VALID_TO_NUMBER, [])
 
 		def test_send(self):
 			sms = self.sms
@@ -285,7 +286,7 @@ if TEST_SMTP_BACKENDS:
 			self.assertEqual(numSent, 1)
 
 		def test_send_sms(self):
-			numSent = send_sms("Body", FROM_NUMBER, [TO_NUMBER])
+			numSent = send_sms("Body", VALID_FROM_NUMBER, [VALID_TO_NUMBER])
 			self.assertEqual(numSent, 1)
 
 		def test_send_to_nobody(self):
