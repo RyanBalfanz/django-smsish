@@ -136,7 +136,6 @@ if 'django_rq' in INSTALLED_APPS:
     RQ_QUEUES = {
         'default': {
             'URL': os.getenv("REDIS_URL", None),
-            'ASYNC': False,
         },
     }
     if DEBUG or TESTING:
