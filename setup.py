@@ -23,6 +23,8 @@ setup(
 	author='Ryan Balfanz',
 	author_email='ryan@ryanbalfanz.net',
 	classifiers=[
+		'Development Status :: 4 - Beta',
+		# 'Development Status :: 5 - Production/Stable',
 		'Environment :: Web Environment',
 		'Framework :: Django',
 		'Framework :: Django :: 1.8',
