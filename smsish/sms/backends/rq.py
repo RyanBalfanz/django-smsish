@@ -22,7 +22,7 @@ class SMSBackend(BaseSMSBackend):
 
 	def send_messages(self, sms_messages):
 		"""
-		Receives a list of SMSMessage instances and returns the number of successfully delivered messages.
+		Receives a list of SMSMessage instances and returns a list of RQ `Job` instances.
 		"""
 		results = []
 		for message in sms_messages:
