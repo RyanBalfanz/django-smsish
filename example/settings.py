@@ -119,6 +119,7 @@ INSTALLED_APPS += (
 SMS_BACKEND_CONSOLE = 'smsish.sms.backends.console.SMSBackend'
 SMS_BACKEND_DUMMY = 'smsish.sms.backends.dummy.SMSBackend'
 SMS_BACKEND_LOCMEM = 'smsish.sms.backends.locmem.SMSBackend'
+SMS_BACKEND_MAILTRAP = 'smsish.sms.backends.mailtrap.SMSBackend'
 SMS_BACKEND_RQ = 'smsish.sms.backends.rq.SMSBackend'
 SMS_BACKEND_TWILIO = 'smsish.sms.backends.twilio.SMSBackend'
 SMS_BACKEND = os.getenv("SMS_BACKEND", SMS_BACKEND_CONSOLE)
@@ -141,6 +142,14 @@ if 'django_rq' in INSTALLED_APPS:
             for queueConfig in RQ_QUEUES.values():
                 queueConfig['ASYNC'] = False
 
+SMS_BACKEND = SMS_BACKEND_MAILTRAP
 if SMS_BACKEND == SMS_BACKEND_RQ:
     SMSISH_RQ_SMS_BACKEND = SMS_BACKEND_CONSOLE
     SMSISH_RQ_SMS_BACKEND = os.getenv("SMSISH_RQ_SMS_BACKEND", SMS_BACKEND_CONSOLE)
+elif SMS_BACKEND == SMS_BACKEND_MAILTRAP:
+    SMSISH_MAILTRAP_SMS_BACKEND_EMAIL_BACKEND = "smsish.mail.backends.mailtrap.EmailBackend"
+
+MAILTRAP_EMAIL_HOST = os.getenv("MAILTRAP_EMAIL_HOST", "mailtrap.io")
+MAILTRAP_EMAIL_HOST_USER = os.getenv("MAILTRAP_EMAIL_HOST_USER", None)
+MAILTRAP_EMAIL_HOST_PASSWORD = os.getenv("MAILTRAP_EMAIL_HOST_PASSWORD", None)
+MAILTRAP_EMAIL_HOST_PORT = os.getenv("MAILTRAP_EMAIL_HOST_PORT", "2525")
