@@ -1,4 +1,4 @@
-from .smtp import SMSBackend as SMTPSMSBackend
+from smsish.sms.backends.smtp import SMSBackend as SMTPSMSBackend
 
 
 class SMSBackend(SMTPSMSBackend):

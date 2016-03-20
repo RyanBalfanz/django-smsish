@@ -1,6 +1,9 @@
 from django.conf import settings
+from django.core.mail import get_connection
+from django.core.mail.message import EmailMessage
 
-from .base import BaseSMSBackend
+from smsish.mail.utils import emailify_phone_number
+from smsish.sms.backends.base import BaseSMSBackend
 
 DEFAULT_SMS_OVER_EMAIL_BACKEND = "smsish.mail.backends.mailtrap.EmailBackend"
 
@@ -24,10 +27,6 @@ class SMSBackend(BaseSMSBackend):
 
 
 def transform_sms_to_email_message(sms_message):
-	from django.core.mail import get_connection
-	from django.core.mail.message import EmailMessage
-	from smsish.mail.utils import emailify_phone_number
-
 	backend = getattr(settings, "SMSISH_MAILTRAP_SMS_BACKEND_EMAIL_BACKEND", DEFAULT_SMS_OVER_EMAIL_BACKEND)
 	conn = get_connection(backend=backend)
 	email = EmailMessage(
