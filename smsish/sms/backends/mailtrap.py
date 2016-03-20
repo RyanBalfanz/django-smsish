@@ -6,8 +6,8 @@ DEFAULT_SMS_OVER_EMAIL_BACKEND = "smsish.mail.backends.mailtrap.EmailBackend"
 
 
 class SMSBackend(BaseSMSBackend):
-	def __init__(self, host=None, port=None, username=None, password=None, fail_silently=False, **kwargs):
-		super(SMSBackend, self).__init__()
+	def __init__(self, *args, **kwargs):
+		super(SMSBackend, self).__init__(*args, **kwargs)
 
 	def send_messages(self, sms_messages):
 		results = []
