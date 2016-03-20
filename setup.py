@@ -1,4 +1,5 @@
 import os
+from setuptools import find_packages
 from setuptools import setup
 
 with open(os.path.join(os.path.dirname(__file__), 'README.md')) as readme:
@@ -10,12 +11,13 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 setup(
 	name='django-smsish',
 	version='1.3.0',
-	packages=[
-		'smsish',
-		'smsish.mail',
-		'smsish.sms',
-		'smsish.sms.backends',
-	],
+	# packages=[
+	# 	'smsish',
+	# 	'smsish.mail',
+	# 	'smsish.sms',
+	# 	'smsish.sms.backends',
+	# ],
+	packages=find_packages(),
 	include_package_data=True,
 	license='MIT',  # example license
 	description='A simple Django app to send SMS messages using an API similar to that of django.core.mail.',
