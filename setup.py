@@ -12,6 +12,7 @@ setup(
 	version='1.3.0',
 	packages=[
 		'smsish',
+		'smsish.mail',
 		'smsish.sms',
 		'smsish.sms.backends',
 	],
