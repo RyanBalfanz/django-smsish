@@ -231,6 +231,45 @@ class SendSMSUsingLocmemTestCase(TestCase):
 			self.assertEqual(len(mail.outbox), 10)
 
 
+@override_settings(
+	SMS_BACKEND='smsish.sms.backends.mailtrap.SMSBackend',
+	SMSISH_MAILTRAP_SMS_BACKEND_EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
+class SendSMSUsingMailtrapTestCase(TestCase):
+	def setUp(self):
+		self.sms = SMSMessage(
+			"Body",
+			VALID_FROM_NUMBER,
+			[VALID_TO_NUMBER]
+		)
+		self.sms_no_recipients = SMSMessage("Body", VALID_TO_NUMBER, [])
+
+	def test_send(self):
+		sms = self.sms
+		numSent = sms.send()
+		self.assertEqual(numSent, [1])
+		self.assertEqual(len(mail.outbox), 1)
+
+	def test_send_sms(self):
+		results = send_sms("Body", VALID_FROM_NUMBER, [VALID_TO_NUMBER])
+		self.assertEqual(results, [1])
+		self.assertEqual(len(mail.outbox), 1)
+
+	def test_send_to_nobody(self):
+		sms = self.sms_no_recipients
+		results = sms.send()
+		self.assertEqual(results, 0)
+		self.assertEqual(len(mail.outbox), 0)
+
+	def test_send_mass_sms(self):
+		from django.conf import settings
+		from smsish.sms import get_sms_connection
+		with get_sms_connection(settings.SMS_BACKEND) as connection:
+			datatuple = (("Body", VALID_FROM_NUMBER, [VALID_TO_NUMBER]) for _ in range(10))
+			results = send_mass_sms(datatuple, connection=connection)
+			self.assertEqual(sum(results), 10)
+			self.assertEqual(len(mail.outbox), 10)
+
+
 @override_settings(SMS_BACKEND='smsish.sms.backends.rq.SMSBackend')
 @override_settings(SMSISH_RQ_SMS_BACKEND='smsish.sms.backends.locmem.SMSBackend')
 @override_settings(TESTING=True)
