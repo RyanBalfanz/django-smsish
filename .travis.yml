@@ -19,6 +19,7 @@ env:
   - DJANGO_VERSION=1.9.2
   - DJANGO_VERSION=1.9.3
   - DJANGO_VERSION=1.9.4
+  - DJANGO_VERSION=1.10
 python:
   # Django 1.9 requires Python 2.7, 3.4, or 3.5.
   # Since Django 1.8, we’ve dropped support for Python 3.2 and 3.3, and added support for Python 3.5.
